@@ -1,3 +1,4 @@
+import os
 from fpdf import FPDF
 import requests
 from typing import List, Optional
@@ -30,6 +31,7 @@ def generate_qr_pdf(qr_code_urls: List[str], filename: Optional[str] = "qr_codes
 
     # arrange the QR codes in a grid of 8 rows x 6 columns
     row, col = 0, 0
+    temp_files = []
     for url in qr_code_urls:
         if col == 6:
             col = 0
@@ -38,10 +40,16 @@ def generate_qr_pdf(qr_code_urls: List[str], filename: Optional[str] = "qr_codes
         y_pos = 10 + row * 30
         print(url, col, row, x_pos, y_pos)
         response = requests.get(url)
-        with open(f"temp_qr_{row}_{col}.png", "wb") as f:
+        temp_file = f"temp_qr_{row}_{col}.png"
+        with open(temp_file, "wb") as f:
             f.write(response.content)
-        pdf.image(f"temp_qr_{row}_{col}.png", x=x_pos, y=y_pos, w=40)
+        pdf.image(temp_file, x=x_pos, y=y_pos, w=40)
+        temp_files.append(temp_file)
         col += 1
+
+    # clean up temporary files
+    for file in temp_files:
+        os.remove(file)
 
     pdf.output(filename)
     print(f"QR codes generated and saved to {filename}")
