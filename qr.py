@@ -18,7 +18,9 @@ def gen_qr(url: str) -> str:
     return base_url + url
 
 
-def generate_qr_pdf(qr_code_urls: List[str], filename: Optional[str] = "qr_codes.pdf"):
+def generate_qr_pdf(
+    qr_code_urls: List[str], filename: Optional[str] = "qr_codes.pdf", num_cols: int = 6
+):
     """
     Generate a PDF containing QR codes from the given list of QR code URLs.
 
@@ -29,13 +31,11 @@ def generate_qr_pdf(qr_code_urls: List[str], filename: Optional[str] = "qr_codes
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    # arrange the QR codes in a grid of 8 rows x 6 columns
+    # arrange the QR codes in a grid
     row, col = 0, 0
     temp_files = []
-    for url in qr_code_urls:
-        if col == 6:
-            col = 0
-            row += 1
+    for i, url in enumerate(qr_code_urls):
+        row, col = divmod(i, num_cols)
         x_pos = 10 + col * 30
         y_pos = 10 + row * 30
         print(url, col, row, x_pos, y_pos)
@@ -45,7 +45,6 @@ def generate_qr_pdf(qr_code_urls: List[str], filename: Optional[str] = "qr_codes
             f.write(response.content)
         pdf.image(temp_file, x=x_pos, y=y_pos, w=40)
         temp_files.append(temp_file)
-        col += 1
 
     # clean up temporary files
     for file in temp_files:
