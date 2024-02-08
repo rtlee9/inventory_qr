@@ -1,7 +1,9 @@
 import os
 from fpdf import FPDF
+from PyPDF2 import PdfWriter, PdfReader
 import requests
-from typing import List, Optional
+from typing import List, Optional, Iterable
+from collections import deque
 
 
 def gen_qr(url: str) -> str:
@@ -22,6 +24,7 @@ def generate_qr_pdf(
     qr_code_urls: List[str],
     filename: Optional[str] = "qr_codes.pdf",
     num_cols: int = 6,
+    num_rows: int = 8,
     descriptions: Optional[List[str]] = None,
 ):
     """
@@ -31,42 +34,60 @@ def generate_qr_pdf(
     :return: None
     """
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
     if not descriptions:
-        descriptions = qr_code_urls
+        descriptions = deque(qr_code_urls)
     else:
         assert len(descriptions) == len(
             qr_code_urls
         ), "Number of descriptions should match the number of QR codes"
+        descriptions = deque(descriptions)
+
+    def add_descriptions():
+        """
+        Add descriptions underneath each QR code in the PDF. Run once per page
+        """
+        for i in range(num_rows * num_cols):
+            if not descriptions:
+                return
+            description = descriptions.popleft()
+            # include the filename under each QR code
+            row, col = divmod(i, num_cols)
+            x_pos = 15 + col * 30
+            y_pos = 44 + row * 30
+            pdf.set_font("Arial", size=3)
+            pdf.text(x_pos, y_pos, description)
 
     # arrange the QR codes in a grid
     row, col = 0, 0
     temp_files = []
     for i, url in enumerate(qr_code_urls):
+        if i >= num_cols * num_rows:  # reset to new page
+            add_descriptions()
+            row, col = 0, 0
+            pdf.add_page()
         row, col = divmod(i, num_cols)
+        row %= num_rows
         x_pos = 10 + col * 30
         y_pos = 10 + row * 30
-        print(url, col, row, x_pos, y_pos)
         response = requests.get(url)
         temp_file = f"temp_qr_{row}_{col}.png"
         with open(temp_file, "wb") as f:
             f.write(response.content)
         pdf.image(temp_file, x=x_pos, y=y_pos, w=40)
+
         temp_files.append(temp_file)
 
-    for i, url in enumerate(descriptions):
-        row, col = divmod(i, num_cols)
-        x_pos = 10 + col * 30
-        y_pos = 10 + row * 30
-        # include the filename under each QR code
-        pdf.set_font("Arial", size=3)
-        pdf.text(x_pos + 5, y_pos + 34, url)
+    # add descriptions under qr codes for the last page
+    add_descriptions()
 
     # clean up temporary files
     for file in temp_files:
-        os.remove(file)
+        try:
+            os.remove(file)
+        except FileNotFoundError as e:
+            pass
 
     pdf.output(filename)
     print(f"QR codes generated and saved to {filename}")
