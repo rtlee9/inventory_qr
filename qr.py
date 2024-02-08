@@ -1,3 +1,4 @@
+from functools import lru_cache
 import os
 from fpdf import FPDF
 from PyPDF2 import PdfWriter, PdfReader
@@ -5,6 +6,9 @@ import requests
 from typing import List, Optional, Iterable
 from collections import deque
 from tqdm import trange
+
+
+cache_get = lru_cache(requests.get)
 
 
 def gen_qr(url: str) -> str:
