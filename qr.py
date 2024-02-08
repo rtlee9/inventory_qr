@@ -104,7 +104,12 @@ def main():
 
     parser = argparse.ArgumentParser(description="Generate PDF with QR codes")
     parser.add_argument(
-        "--qr-code-urls", type=str, nargs="+", help="URLs for QR codes", required=True
+        "-q",
+        "--qr-code-urls",
+        type=str,
+        nargs="+",
+        help="URLs for QR codes",
+        required=True,
     )
     parser.add_argument(
         "--filename",
