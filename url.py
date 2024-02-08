@@ -14,13 +14,13 @@ HEADERS = {
 }
 
 
-def create(long_url: str, target: Optional[str]) -> dict:
+def create(long_url: str, key: Optional[str]) -> dict:
     """
     Create a shortened URL.
 
     Args:
     long_url (str): The long URL to be shortened.
-    target (str): The custom key for the shortened URL.
+    key (str): The custom key for the shortened URL.
 
     Returns:
     dict: The response containing the shortened URL information.
@@ -28,8 +28,8 @@ def create(long_url: str, target: Optional[str]) -> dict:
     body = {
         "longUrl": long_url,
     }
-    if target:
-        body["customKey"] = target
+    if key:
+        body["customKey"] = key
     response = requests.post(
         "https://api.aws3.link/shorten", headers=HEADERS, data=json.dumps(body)
     ).json()
@@ -104,20 +104,15 @@ if __name__ == "__main__":
         choices=["create", "update", "delete", "track"],
         help="Action to perform",
     )
-    parser.add_argument(
-        "--key", type=str, help="Key to be updated or deleted", required=False
-    )
+    parser.add_argument("key", type=str, help="Key to be updated or deleted")
     parser.add_argument(
         "--long-url", type=str, help="New long URL to update with", required=False
-    )
-    parser.add_argument(
-        "--target", type=str, help="Custom key for the shortened URL", required=False
     )
 
     args = parser.parse_args()
 
     if args.action == "create":
-        print(create(args.long_url, args.target))
+        print(create(args.long_url, args.key))
     elif args.action == "update":
         print(update(args.key, args.long_url))
     elif args.action == "delete":
