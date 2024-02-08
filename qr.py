@@ -38,7 +38,7 @@ def generate_qr_pdf(
     :param qr_code_urls: A list of URLs pointing to the QR codes.
     :return: None
     """
-    pdf = FPDF()
+    pdf = FPDF(format="letter")
     pdf.add_page()
 
     col_offset, row_offset = 31.7, 31.7
