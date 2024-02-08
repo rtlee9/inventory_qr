@@ -99,6 +99,17 @@ def generate_qr_pdf(
     print(f"QR codes generated and saved to {filename}")
 
 
+def gen_qr_range(
+    base_shortned_url: str, idx_start: int, num_codes: int, filename: Optional[str]
+):
+    base_qr_url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs=100x100&&margin=1&chld=L&chl="
+    base_shortened_urls = [
+        f"{base_qr_url}{base_shortned_url}{i}"
+        for i in range(idx_start, idx_start + num_codes)
+    ]
+    generate_qr_pdf(base_shortened_urls, filename)
+
+
 def main():
     import argparse
 
@@ -123,4 +134,23 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Generate QR codes for a range of URLs."
+    )
+    parser.add_argument(
+        "base_shortned_url", type=str, help="Base URL for the shortened URLs"
+    )
+    parser.add_argument("idx_start", type=int, help="Starting index for the range")
+    parser.add_argument("num_codes", type=int, help="Number of codes to generate")
+    parser.add_argument(
+        "--filename",
+        type=str,
+        help="Filename for the PDF",
+        required=False,
+        default="qr_codes.pdf",
+    )
+    args = parser.parse_args()
+
+    gen_qr_range(args.base_shortned_url, args.idx_start, args.num_codes, args.filename)
