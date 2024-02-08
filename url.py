@@ -72,6 +72,27 @@ def update(key: str, new_long_url: str):
     create(new_long_url, key)
 
 
+def track(key):
+    """
+    Tracks hits corresponding to the specified key from the API.
+
+    Args:
+    key (str): The key to be tracked.
+
+    Returns:
+    dict: The JSON response from the API.
+    """
+    # Make a POST request to the AWS3 API to remove the specified key
+    response = requests.post(
+        "https://api.aws3.link/track",
+        headers=HEADERS,
+        data=json.dumps({"key": key}),
+    )
+
+    # Return the JSON response from the API
+    return response.json()
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -79,7 +100,9 @@ if __name__ == "__main__":
 
     # TODO: make all arguments below optional except for action
     parser.add_argument(
-        "action", choices=["create", "update", "delete"], help="Action to perform"
+        "action",
+        choices=["create", "update", "delete", "track"],
+        help="Action to perform",
     )
     parser.add_argument(
         "--key", type=str, help="Key to be updated or deleted", required=False
@@ -99,3 +122,5 @@ if __name__ == "__main__":
         print(update(args.key, args.long_url))
     elif args.action == "delete":
         print(delete(args.key))
+    elif args.action == "track":
+        print(track(args.key))
