@@ -37,6 +37,10 @@ def generate_qr_pdf(
     pdf = FPDF()
     pdf.add_page()
 
+    col_offset, row_offset = 31.7, 31.7
+    col_start, row_start = 14.8, 14.8
+    size = 28.8
+
     if not descriptions:
         descriptions = deque(qr_code_urls)
     else:
@@ -55,8 +59,8 @@ def generate_qr_pdf(
             description = descriptions.popleft()
             # include the filename under each QR code
             row, col = divmod(i, num_cols)
-            x_pos = 15 + col * 30
-            y_pos = 44 + row * 30
+            x_pos = col_start + 5 + col * col_offset
+            y_pos = row_start + 29 + row * row_offset
             pdf.set_font("Arial", size=3)
             pdf.text(x_pos, y_pos, description)
 
@@ -71,13 +75,13 @@ def generate_qr_pdf(
             pdf.add_page()
         row, col = divmod(i, num_cols)
         row %= num_rows
-        x_pos = 10 + col * 30
-        y_pos = 10 + row * 30
-        response = requests.get(url)
+        x_pos = col_start + col * col_offset
+        y_pos = row_start + row * row_offset
+        response = cache_get(url)
         temp_file = f"temp_qr_{row}_{col}.png"
         with open(temp_file, "wb") as f:
             f.write(response.content)
-        pdf.image(temp_file, x=x_pos, y=y_pos, w=40)
+        pdf.image(temp_file, x=x_pos, y=y_pos, w=size)
 
         temp_files.append(temp_file)
 
