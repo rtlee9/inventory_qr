@@ -4,6 +4,7 @@ from PyPDF2 import PdfWriter, PdfReader
 import requests
 from typing import List, Optional, Iterable
 from collections import deque
+from tqdm import trange
 
 
 def gen_qr(url: str) -> str:
@@ -62,7 +63,8 @@ def generate_qr_pdf(
     # arrange the QR codes in a grid
     row, col = 0, 0
     temp_files = []
-    for i, url in enumerate(qr_code_urls):
+    for i in trange(len(qr_code_urls)):
+        url = qr_code_urls[i]
         if i >= num_cols * num_rows:  # reset to new page
             add_descriptions()
             row, col = 0, 0
