@@ -64,8 +64,8 @@ def generate_qr_pdf(
             # include the filename under each QR code
             row, col = divmod(i, num_cols)
             x_pos = col_start + 5 + col * col_offset
-            y_pos = row_start + 29 + row * row_offset
-            pdf.set_font("Arial", size=3)
+            y_pos = row_start + 31 + row * row_offset
+            pdf.set_font("Arial", size=8)
             pdf.text(x_pos, y_pos, description)
 
     # arrange the QR codes in a grid
