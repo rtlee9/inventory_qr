@@ -3,6 +3,8 @@ import json
 from typing import Optional
 import os
 from dotenv import load_dotenv
+import sqlite3
+from contextlib import closing
 
 
 load_dotenv()
@@ -12,6 +14,22 @@ HEADERS = {
     "x-api-key": AWS_API_KEY,
     "Content-Type": "application/json",
 }
+
+conn = sqlite3.connect("url_actions.db")
+
+# Log a URL deletion action
+# cursor.execute("INSERT INTO url_actions (action_type, url, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)", ('delete', deleted_url))
+
+# db is set up in CLI `sqlite3 url_actions.db` with
+# CREATE TABLE url_actions (
+#    id INTEGER PRIMARY KEY,
+#    action_type TEXT,
+#    long_url TEXT,
+#    response_json TEXT,
+#    response_code INTEGER,
+#    timestamp DATETIME,
+#    url_key TEXT
+# );
 
 
 def create(long_url: str, key: Optional[str]) -> dict:
@@ -32,8 +50,17 @@ def create(long_url: str, key: Optional[str]) -> dict:
         body["customKey"] = key
     response = requests.post(
         "https://api.aws3.link/shorten", headers=HEADERS, data=json.dumps(body)
-    ).json()
-    return response
+    )
+    data = response.json()
+
+    # log to db
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            "INSERT INTO url_actions (action_type, long_url, response_json, response_code, timestamp, url_key) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
+            ("create", long_url, json.dumps(data), response.status_code, key),
+        )
+
+    return data
 
 
 def delete(key):
@@ -52,9 +79,17 @@ def delete(key):
         headers=HEADERS,
         data=json.dumps({"key": key}),
     )
+    data = response.json()
+
+    # log to db
+    with closing(conn.cursor()) as cursor:
+        cursor.execute(
+            "INSERT INTO url_actions (action_type, long_url, response_json, response_code, timestamp, url_key) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
+            ("delete", None, json.dumps(data), response.status_code, key),
+        )
 
     # Return the JSON response from the API
-    return response.json()
+    return data
 
 
 def update(key: str, new_long_url: str):
@@ -119,3 +154,4 @@ if __name__ == "__main__":
         print(delete(args.key))
     elif args.action == "track":
         print(track(args.key))
+    conn.commit()
