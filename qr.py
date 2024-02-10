@@ -108,12 +108,13 @@ def gen_qr_range(
     idx_start: int,
     num_codes: int,
     filename: Optional[str],
+    is_test: Optional[bool] = False,
     **position_kwargs,
 ):
     base_qr_url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs=100x100&&margin=1&chld=L&chl="
     base_shortened_urls = [
-        f"{base_qr_url}{base_shortned_url}{i}"
-        for i in range(idx_start, idx_start + num_codes)
+        f"{base_qr_url}{base_shortned_url}{100 if is_test else i}"
+        for i in postfix_range
     ]
     generate_qr_pdf(
         base_shortened_urls,
@@ -189,6 +190,12 @@ def cli_range():
         "--row_start", type=float, help="Starting row index", required=False
     )
     parser.add_argument("--size", type=int, help="Size of the QR codes", required=False)
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Flag to indicate if this is a test run",
+        required=False,
+    )
     args = parser.parse_args()
 
     gen_qr_range(
@@ -196,6 +203,7 @@ def cli_range():
         args.idx_start,
         args.num_codes,
         args.filename,
+        is_test=args.test,
         col_offset=args.col_offset,
         row_offset=args.row_offset,
         col_start=args.col_start,
