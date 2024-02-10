@@ -1,9 +1,8 @@
 from functools import lru_cache
 import os
 from fpdf import FPDF
-from PyPDF2 import PdfWriter, PdfReader
 import requests
-from typing import List, Optional, Iterable
+from typing import List, Optional
 from collections import deque
 from tqdm import trange
 
@@ -31,6 +30,11 @@ def generate_qr_pdf(
     num_cols: int = 6,
     num_rows: int = 8,
     descriptions: Optional[List[str]] = None,
+    col_offset: Optional[int] = 31.7,
+    row_offset: Optional[int] = 31.7,
+    col_start: Optional[int] = 14.8,
+    row_start: Optional[int] = 14.8,
+    size: Optional[int] = 30,
 ):
     """
     Generate a PDF containing QR codes from the given list of QR code URLs.
@@ -40,10 +44,6 @@ def generate_qr_pdf(
     """
     pdf = FPDF(format="letter")
     pdf.add_page()
-
-    col_offset, row_offset = 31.7, 31.7
-    col_start, row_start = 14.8, 14.8
-    size = 28.8
 
     if not descriptions:
         descriptions = deque(qr_code_urls)
@@ -104,17 +104,25 @@ def generate_qr_pdf(
 
 
 def gen_qr_range(
-    base_shortned_url: str, idx_start: int, num_codes: int, filename: Optional[str]
+    base_shortned_url: str,
+    idx_start: int,
+    num_codes: int,
+    filename: Optional[str],
+    **position_kwargs,
 ):
     base_qr_url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs=100x100&&margin=1&chld=L&chl="
     base_shortened_urls = [
         f"{base_qr_url}{base_shortned_url}{i}"
         for i in range(idx_start, idx_start + num_codes)
     ]
-    generate_qr_pdf(base_shortened_urls, filename)
+    generate_qr_pdf(
+        base_shortened_urls,
+        filename,
+        **{kwarg: val for kwarg, val in position_kwargs.items() if val is not None},
+    )
 
 
-def main():
+def cli_qr_list():
     import argparse
 
     parser = argparse.ArgumentParser(description="Generate PDF with QR codes")
@@ -137,7 +145,20 @@ def main():
     generate_qr_pdf(args.qr_code_urls, args.filename)
 
 
-if __name__ == "__main__":
+def cli_range():
+    """
+    Generate QR codes for a range of URLs.
+    Args:
+        base_shortned_url (str): Base URL for the shortened URLs
+        idx_start (int): Starting index for the range
+        num_codes (int): Number of codes to generate
+        filename (str): Filename for the PDF
+        ol_offset (int): Offset for the OL
+        row_offset (int): Offset for the row
+        col_start (int): Starting column index
+        row_start (int): Starting row index
+        size (int): Size of the QR codes
+    """
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -155,6 +176,33 @@ if __name__ == "__main__":
         required=False,
         default="qr_codes.pdf",
     )
+    parser.add_argument(
+        "--col_offset", type=float, help="Offset for the OL", required=False
+    )
+    parser.add_argument(
+        "--row_offset", type=float, help="Offset for the row", required=False
+    )
+    parser.add_argument(
+        "--col_start", type=float, help="Starting column index", required=False
+    )
+    parser.add_argument(
+        "--row_start", type=float, help="Starting row index", required=False
+    )
+    parser.add_argument("--size", type=int, help="Size of the QR codes", required=False)
     args = parser.parse_args()
 
-    gen_qr_range(args.base_shortned_url, args.idx_start, args.num_codes, args.filename)
+    gen_qr_range(
+        args.base_shortned_url,
+        args.idx_start,
+        args.num_codes,
+        args.filename,
+        col_offset=args.col_offset,
+        row_offset=args.row_offset,
+        col_start=args.col_start,
+        row_start=args.row_start,
+        size=args.size,
+    )
+
+
+if __name__ == "__main__":
+    cli_range()
