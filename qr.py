@@ -112,13 +112,16 @@ def gen_qr_range(
     **position_kwargs,
 ):
     base_qr_url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs=100x100&&margin=1&chld=L&chl="
+    postfix_range = range(idx_start, idx_start + num_codes)
     base_shortened_urls = [
         f"{base_qr_url}{base_shortned_url}{100 if is_test else i}"
         for i in postfix_range
     ]
+    descriptions = [str(i) for i in postfix_range] if base_shortned_url.startswith("aws3.link/llqrv") else None
     generate_qr_pdf(
         base_shortened_urls,
         filename,
+        descriptions=descriptions,
         **{kwarg: val for kwarg, val in position_kwargs.items() if val is not None},
     )
 
