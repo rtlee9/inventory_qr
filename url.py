@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import sqlite3
 from contextlib import closing
+from urllib.parse import urlencode
 
 
 load_dotenv()
@@ -43,7 +44,14 @@ def create(long_url: str, key: Optional[str]) -> dict:
     Returns:
     dict: The response containing the shortened URL information.
     """
+    tracking_params = {"utm_source": "ad-shop", "utm_medium": "qr-sticker", "utm_campaign": "qr-code-stickers"}
+    url_params = urlencode(tracking_params)
+    if "?" in long_url:
+         long_url += "&" + url_params
+    else:
+         long_url += "?" + url_params
     body = {
+        # TODO: append tracking params dict to long_url
         "longUrl": long_url,
     }
     if key:
