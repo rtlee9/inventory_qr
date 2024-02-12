@@ -149,7 +149,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("key", type=str, help="Key to be updated or deleted")
     parser.add_argument(
-        "--long-url", type=str, help="New long URL to update with", required=False
+        "-l", "--long-url", type=str, help="New long URL to update with", required=False
     )
 
     args = parser.parse_args()
