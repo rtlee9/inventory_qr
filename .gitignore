@@ -9,6 +9,7 @@ ancestree_shop/whoosh_index/*
 ancestree_shop/public/
 .vscode/*
 node_modules/*
+*.db
 
 # Vim
 *.swp
