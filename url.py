@@ -44,12 +44,16 @@ def create(long_url: str, key: Optional[str]) -> dict:
     Returns:
     dict: The response containing the shortened URL information.
     """
-    tracking_params = {"utm_source": "ad-shop", "utm_medium": "qr-sticker", "utm_campaign": "qr-code-stickers"}
+    tracking_params = {
+        "utm_source": "ad-shop",
+        "utm_medium": "qr-sticker",
+        "utm_campaign": "qr-code-stickers",
+    }
     url_params = urlencode(tracking_params)
     if "?" in long_url:
-         long_url += "&" + url_params
+        long_url += "&" + url_params
     else:
-         long_url += "?" + url_params
+        long_url += "?" + url_params
     body = {
         # TODO: append tracking params dict to long_url
         "longUrl": long_url,
@@ -111,8 +115,7 @@ def update(key: str, new_long_url: str):
     Returns:
     None
     """
-    delete(key)
-    create(new_long_url, key)
+    return [delete(key), create(new_long_url, key)]
 
 
 def track(key):
