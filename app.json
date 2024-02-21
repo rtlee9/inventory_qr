@@ -1,0 +1,27 @@
+{
+    "name": "Dynamic QR",
+    "keywords": [
+        "python",
+        "e-commerce"
+    ],
+    "repository": "https://github.com/rtlee9/inventory_qr",
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "environments": {
+        "test": {
+            "scripts": {
+                "test-setup": "pip install -r requirements_test.txt",
+                "test": "pytest tests"
+            },
+            "addons": [
+            ],
+            "env": {
+                "DEBUG": true,
+                "DISABLE_COLLECTSTATIC": 1
+            }
+        }
+    }
+}
