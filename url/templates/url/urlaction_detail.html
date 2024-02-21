@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>Action Type:</strong> {{ object.action_type }}</p>
+            <p><strong>Long URL:</strong> {{ object.long_url }}</p>
+            <p><strong>Response JSON:</strong> {{ object.response_json }}</p>
+            <p><strong>Response Code:</strong> {{ object.response_code }}</p>
+            <p><strong>Timestamp:</strong> {{ object.timestamp }}</p>
+            <p><strong>URL Key:</strong> {{ object.url_key }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

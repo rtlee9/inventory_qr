@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Action Type</th>
+                <th>Long URL</th>
+                <th>Response Code</th>
+                <th>Timestamp</th>
+                <th>URL Key</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for object in object_list %}
+            {% if object.was_successfull %}
+            <tr>
+                <td>{{ object.action_type }}</td>
+                <td>{{ object.long_url }}</td>
+                <td>{{ object.response_code }}</td>
+                <td>{{ object.timestamp }}</td>
+                <td>{{ object.url_key }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
