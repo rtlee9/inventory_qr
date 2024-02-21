@@ -25,3 +25,10 @@ class UrlAction(models.Model):
 
     def get_absolute_url(self):
         return reverse("detail", kwargs={"pk": self.pk})
+    
+    @property
+    def long_url_cleaned(self):
+        """Remove GET parameters from URL"""
+        if not self.long_url:
+            return
+        return self.long_url.split('?')[0]

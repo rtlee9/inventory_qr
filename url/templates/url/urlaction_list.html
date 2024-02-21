@@ -19,7 +19,7 @@
             <tr>
                 <td><a href="{{ object.get_absolute_url }}">{{ object.id }}</a></td>
                 <td>{{ object.action_type }}</td>
-                <td>{{ object.long_url }}</td>
+                <td>{{ object.long_url_cleaned }}</td>
                 <td>{{ object.timestamp|timezone:"America/Los_Angeles" }}</td>
                 <td>{{ object.url_key }}</td>
             </tr>
