@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT ancestree_shop.wsgi --timeout 1000
+web: gunicorn --bind 0.0.0.0:$PORT dynamicqr.wsgi --timeout 1000
