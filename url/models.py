@@ -1,12 +1,15 @@
 from django.db import models
 
+
 class UrlAction(models.Model):
     ACTION_TYPES = (
-        ('create', 'Create'),
-        ('update', 'Update'),
-        ('delete', 'Delete'),
+        ("create", "Create"),
+        ("update", "Update"),
+        ("delete", "Delete"),
     )
-    action_type = models.CharField(max_length=10, choices=ACTION_TYPES, blank=False, null=False)
+    action_type = models.CharField(
+        max_length=10, choices=ACTION_TYPES, blank=False, null=False
+    )
     long_url = models.URLField(max_length=400, blank=True, null=True)
     response_json = models.JSONField(blank=True, null=True)
     response_code = models.IntegerField(blank=True, null=True)
