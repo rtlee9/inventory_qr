@@ -49,10 +49,11 @@ def create(long_url: str, key: Optional[str]) -> dict:
         "utm_campaign": "qr-code-stickers",
     }
     url_params = urlencode(tracking_params)
-    if "?" in long_url:
-        long_url += "&" + url_params
-    else:
-        long_url += "?" + url_params
+    if long_url:
+        if "?" in long_url:
+            long_url += "&" + url_params
+        else:
+            long_url += "?" + url_params
     body = {
         # TODO: append tracking params dict to long_url
         "longUrl": long_url,
