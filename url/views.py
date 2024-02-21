@@ -1,6 +1,5 @@
 import logging
 from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django import forms
 
@@ -11,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 from . import models
 
-detail_view = login_required(DetailView.as_view(model=models.UrlAction))
-list_view = login_required(ListView.as_view(model=models.UrlAction))
+detail_view = DetailView.as_view(model=models.UrlAction)
+list_view = ListView.as_view(model=models.UrlAction)
 
 url_actions = {
     "create": create,
