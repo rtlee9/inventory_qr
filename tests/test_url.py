@@ -1,4 +1,4 @@
-from ..url import update, delete, create
+from ..utils.url import update, delete, create
 
 import unittest
 from unittest.mock import patch
@@ -18,7 +18,7 @@ class TestCreateFunction(unittest.TestCase):
             "shortUrl": "https://example.com/s/abc123"
         }
         result = create("https://www.example.com/very/long/url", "custom_key")
-        self.assertEqual(result, {"shortUrl": "https://example.com/s/abc123"})
+        self.assertEqual(json.loads(result['response_json']), {"shortUrl": "https://example.com/s/abc123"})
 
     @patch("requests.post")
     def test_create_with_long_url_only(self, mock_post):
@@ -26,7 +26,7 @@ class TestCreateFunction(unittest.TestCase):
             "shortUrl": "https://example.com/s/def456"
         }
         result = create("https://www.example.com/another/long/url", None)
-        self.assertEqual(result, {"shortUrl": "https://example.com/s/def456"})
+        self.assertEqual(json.loads(result['response_json']), {"shortUrl": "https://example.com/s/def456"})
 
     @patch("requests.post")
     def test_create_with_target_only(self, mock_post):
@@ -34,7 +34,7 @@ class TestCreateFunction(unittest.TestCase):
             "shortUrl": "https://example.com/s/ghi789"
         }
         result = create(None, "custom_key")
-        self.assertEqual(result, {"shortUrl": "https://example.com/s/ghi789"})
+        self.assertEqual(json.loads(result['response_json']), {"shortUrl": "https://example.com/s/ghi789"})
 
 
 class TestDeleteFunction(unittest.TestCase):
@@ -51,7 +51,7 @@ class TestDeleteFunction(unittest.TestCase):
             headers=headers,
             data=json.dumps({"key": key}),
         )
-        self.assertEqual(response, {"message": "Key deleted successfully"})
+        self.assertEqual(json.loads(response['response_json']), {"message": "Key deleted successfully"})
 
     @patch("requests.post")
     def test_delete_invalid_key(self, mock_post):
@@ -63,7 +63,7 @@ class TestDeleteFunction(unittest.TestCase):
             headers=headers,
             data=json.dumps({"key": key}),
         )
-        self.assertEqual(response, {"error": "Invalid key"})
+        self.assertEqual(json.loads(response['response_json']), {"error": "Invalid key"})
 
     @patch("requests.post")
     def test_response_format(self, mock_post):
@@ -73,6 +73,7 @@ class TestDeleteFunction(unittest.TestCase):
         key = "valid_key"
         response = delete(key)
         self.assertIsInstance(response, dict)
+        self.assertIsInstance(json.loads(response['response_json']), dict)
 
 
 if __name__ == "__main__":
