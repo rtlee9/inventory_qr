@@ -7,7 +7,7 @@ class UrlAction(models.Model):
         ('delete', 'Delete'),
     )
     action_type = models.CharField(max_length=10, choices=ACTION_TYPES, blank=False, null=False)
-    long_url = models.URLField(max_length=200, blank=True, null=True)
+    long_url = models.URLField(max_length=400, blank=True, null=True)
     response_json = models.JSONField(blank=True, null=True)
     response_code = models.IntegerField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
