@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load tz %}
 
 {% block content %}
 <div class="container">
@@ -8,7 +9,7 @@
             <p><strong>Long URL:</strong> {{ object.long_url }}</p>
             <p><strong>Response JSON:</strong> {{ object.response_json }}</p>
             <p><strong>Response Code:</strong> {{ object.response_code }}</p>
-            <p><strong>Timestamp:</strong> {{ object.timestamp }}</p>
+            <p><strong>Timestamp:</strong> {{ object.timestamp|timezone:"America/Los_Angeles" }}</p>
             <p><strong>URL Key:</strong> {{ object.url_key }}</p>
         </div>
     </div>
