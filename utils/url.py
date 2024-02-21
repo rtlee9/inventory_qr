@@ -16,7 +16,6 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-conn = sqlite3.connect("url_actions.db")
 
 # Log a URL deletion action
 # cursor.execute("INSERT INTO url_actions (action_type, url, timestamp) VALUES (?, ?, CURRENT_TIMESTAMP)", ('delete', deleted_url))
@@ -64,15 +63,7 @@ def create(long_url: str, key: Optional[str]) -> dict:
         "https://api.aws3.link/shorten", headers=HEADERS, data=json.dumps(body)
     )
     data = response.json()
-
-    # log to db
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            "INSERT INTO url_actions (action_type, long_url, response_json, response_code, timestamp, url_key) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
-            ("create", long_url, json.dumps(data), response.status_code, key),
-        )
-
-    return data
+    return dict(action_type="create", long_url=long_url, response_json=json.dumps(data), response_code=response.status_code, url_key=key)
 
 
 def delete(key):
@@ -94,28 +85,21 @@ def delete(key):
     data = response.json()
 
     # log to db
-    with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            "INSERT INTO url_actions (action_type, long_url, response_json, response_code, timestamp, url_key) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?)",
-            ("delete", None, json.dumps(data), response.status_code, key),
-        )
-
-    # Return the JSON response from the API
-    return data
+    return dict(action_type="delete", long_url=None, response_json=json.dumps(data), response_code=response.status_code, url_key=key)
 
 
-def update(key: str, new_long_url: str):
+def update(key: str, long_url: str):
     """
     Update the given key with a new long URL.
 
     Parameters:
     key (str): The key to be updated.
-    new_long_url (str): The new long URL to update with.
+    long_url (str): The new long URL to update with.
 
     Returns:
     None
     """
-    return [delete(key), create(new_long_url, key)]
+    return [delete(key), create(long_url, key)]
 
 
 def track(key):
@@ -165,4 +149,3 @@ if __name__ == "__main__":
         print(delete(args.key))
     elif args.action == "track":
         print(track(args.key))
-    conn.commit()
