@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class UrlAction(models.Model):
@@ -21,3 +22,6 @@ class UrlAction(models.Model):
 
     def was_successfull(self):
         return self.response_code == 200
+
+    def get_absolute_url(self):
+        return reverse("detail", kwargs={"pk": self.pk})
