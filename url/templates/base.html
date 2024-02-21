@@ -15,16 +15,17 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Dynamic QR</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+            </ul>
             {% if user.is_authenticated %}
             Hi {{ user.username }}!
             <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
                 {% csrf_token %}
-                <button type="submit">Log Out</button>
+                <button type="submit" class="btn btn-outline-secondary my-2 my-sm-0">Log Out</button>
             </form>
             {% else %}
             <p>You are not logged in</p>
