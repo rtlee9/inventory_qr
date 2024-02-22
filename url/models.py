@@ -16,6 +16,7 @@ class UrlAction(models.Model):
     response_code = models.IntegerField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     url_key = models.CharField(max_length=100, blank=False, null=False, default="")
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.action_type} ({self.id}): {self.url_key}"
@@ -25,10 +26,10 @@ class UrlAction(models.Model):
 
     def get_absolute_url(self):
         return reverse("detail", kwargs={"pk": self.pk})
-    
+
     @property
     def long_url_cleaned(self):
         """Remove GET parameters from URL"""
         if not self.long_url:
             return
-        return self.long_url.split('?')[0]
+        return self.long_url.split("?")[0]

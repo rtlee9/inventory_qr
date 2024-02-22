@@ -51,6 +51,10 @@ class Create(CreateView):
     model = models.UrlAction
     form_class = CreateForm
 
+    def form_valid(self, form):
+        form.instance.user = self.request.user  # set user foreign key
+        return super().form_valid(form)
+
     def get_success_url(self):
         # perform the url action
         action = url_actions[self.object.action_type]
