@@ -52,7 +52,7 @@ class Create(generic.CreateView):
 
     def get_initial(self):
         initial = super().get_initial().copy()
-        initial["action_type"] = self.request.GET.get("action_type")
+        initial["action_type"] = self.request.GET.get("action_type", "create")
         initial["url_key"] = self.request.GET.get("url_key")
         return initial
 
