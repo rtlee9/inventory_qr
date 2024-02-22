@@ -13,5 +13,15 @@
             <p><strong>URL Key:</strong> {{ object.url_key }}</p>
         </div>
     </div>
+    {% if object.action_type != "delete" %}
+    <div class="row">
+        <div class="col-sm">
+            <a href="{% url 'create' %}?url_key={{ object.url_key }}&action_type=delete" class="btn btn-outline-secondary my-2 my-sm-0">Delete URL key</a>
+        </div>
+        <div class="col-sm">
+            <a href="{% url 'create' %}?url_key={{ object.url_key }}&action_type=update" class="btn btn-outline-secondary my-2 my-sm-0">Update URL key</a>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,8 +1,7 @@
 import logging
-from django.views.generic import ListView, DetailView, CreateView
+from django.views import generic
 from django.urls import reverse
 from django import forms
-from django.db.models import OuterRef, Max, Subquery
 
 
 from utils.url import create, update, delete
@@ -11,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 from . import models
 
-detail_view = DetailView.as_view(model=models.UrlAction)
-list_view = ListView.as_view(model=models.UrlAction)
+detail_view = generic.DetailView.as_view(model=models.UrlAction)
+list_view = generic.ListView.as_view(model=models.UrlAction)
 
 url_actions = {
     "create": create,
@@ -21,7 +20,7 @@ url_actions = {
 }
 
 
-class MostRecentView(ListView):
+class MostRecentView(generic.ListView):
     model = models.UrlAction
     ordering = ["pk"]
 
@@ -47,9 +46,15 @@ class CreateForm(forms.ModelForm):
         return data.get("long_url")
 
 
-class Create(CreateView):
+class Create(generic.CreateView):
     model = models.UrlAction
     form_class = CreateForm
+
+    def get_initial(self):
+        initial = super().get_initial().copy()
+        initial["action_type"] = self.request.GET.get("action_type")
+        initial["url_key"] = self.request.GET.get("url_key")
+        return initial
 
     def form_valid(self, form):
         form.instance.user = self.request.user  # set user foreign key
