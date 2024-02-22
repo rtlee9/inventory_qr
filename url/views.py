@@ -2,6 +2,7 @@ import logging
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse
 from django import forms
+from django.db.models import OuterRef, Max, Subquery
 
 
 from utils.url import create, update, delete
@@ -18,6 +19,20 @@ url_actions = {
     "update": update,
     "delete": delete,
 }
+
+
+class MostRecentView(ListView):
+    model = models.UrlAction
+    ordering = ["pk"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        latest_id_per_url_key = (
+            qs.order_by("url_key", "-timestamp").distinct("url_key").values_list("id")
+        )
+        return qs.filter(pk__in=latest_id_per_url_key).filter(
+            action_type__in=["create", "update"]
+        )
 
 
 class CreateForm(forms.ModelForm):
@@ -46,13 +61,15 @@ class Create(CreateView):
             kwargs["long_url"] = self.object.long_url
         response = action(**kwargs)
         logger.info("Response: %s", response)
-        if action== update:
+        if action == update:
             # handle two sets of responses: one for create and one for delete
-            self.object.response_code = max([item['response_code'] for item in response])
-            self.object.response_json = [item['response_json'] for item in response]
+            self.object.response_code = max(
+                [item["response_code"] for item in response]
+            )
+            self.object.response_json = [item["response_json"] for item in response]
         else:
-            self.object.response_code = response['response_code']
-            self.object.response_json = response['response_json']
+            self.object.response_code = response["response_code"]
+            self.object.response_json = response["response_json"]
         self.object.save()
 
         # get success url
