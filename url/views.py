@@ -10,8 +10,11 @@ logger = logging.getLogger(__name__)
 
 from . import models
 
-detail_view = generic.DetailView.as_view(model=models.UrlAction)
-list_view = generic.ListView.as_view(model=models.UrlAction)
+class DetailView(generic.DetailView):
+    model = models.UrlAction
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
 
 url_actions = {
     "create": create,
@@ -19,13 +22,19 @@ url_actions = {
     "delete": delete,
 }
 
+class AllView(generic.ListView):
+    model = models.UrlAction
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
 
 class MostRecentView(generic.ListView):
     model = models.UrlAction
     ordering = ["pk"]
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = super().get_queryset().filter(user=self.request.user)
         latest_id_per_url_key = (
             qs.order_by("url_key", "-timestamp").distinct("url_key").values_list("id")
         )
