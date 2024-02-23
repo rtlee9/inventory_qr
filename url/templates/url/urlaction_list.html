@@ -21,7 +21,11 @@
                 <td>{{ object.action_type }}</td>
                 <td><a href="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned }}</a></td>
                 <td>{{ object.timestamp|timezone:"America/Los_Angeles" }}</td>
+                {% if object.action_type != "delete" %}
                 <td><a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></td>
+                {% else %}
+                <td>{{ object.url_key }}</td>
+                {% endif %}
             </tr>
             {% endif %}
             {% endfor %}
