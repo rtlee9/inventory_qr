@@ -28,9 +28,14 @@
 </tr>
 </table>
 
-<input type="submit" value="login">
+<input type="submit" value="login" class="btn btn-primary my-2 mx-2">
 <input type="hidden" name="next" value="{{ next }}">
 </form>
+<div class="row">
+    <div class="col-sm">
+        <p>Or </p><a class="btn btn-secondary my-2 mx-2" href="{% url 'django_registration_register' %}">create an account</a>
+    </div>
+</div>
 
 {# Assumes you set up the password_reset view in your URLconf #}
 
