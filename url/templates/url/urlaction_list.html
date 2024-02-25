@@ -12,7 +12,9 @@
         <thead>
             <tr>
                 <th>ID</th>
+                {% if 'history' in request.path %}
                 <th>Type</th>
+                {% endif %}
                 <th>Long URL</th>
                 <th>Timestamp</th>
                 <th>URL Key</th>
@@ -23,7 +25,9 @@
             {% if object.was_successfull %}
             <tr>
                 <td><a href="{{ object.get_absolute_url }}">{{ object.id }}</a></td>
+                {% if 'history' in request.path %}
                 <td>{{ object.action_type }}</td>
+                {% endif %}
                 <td><a href="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned }}</a></td>
                 <td>{{ object.timestamp|timezone:"America/Los_Angeles" }}</td>
                 {% if object.action_type != "delete" %}
