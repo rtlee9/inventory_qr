@@ -4,7 +4,7 @@ from django.urls import reverse
 from django import forms
 
 
-from utils.url import create, update, delete
+from utils.url import create, update, delete, track
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,11 @@ class DetailView(generic.DetailView):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tracking_data"] = track(self.object.url_key)
+        return context
 
 url_actions = {
     "create": create,
