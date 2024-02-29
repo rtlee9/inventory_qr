@@ -4,7 +4,6 @@ from fpdf import FPDF
 import requests
 from typing import List, Optional
 from collections import deque
-from tqdm import trange
 
 
 cache_get = lru_cache(requests.get)
@@ -43,6 +42,8 @@ def generate_qr_pdf(
     :param qr_code_urls: A list of URLs pointing to the QR codes.
     :return: None
     """
+    from tqdm import trange
+
     pdf = FPDF(format="letter")
     pdf.add_page()
 
@@ -118,7 +119,11 @@ def gen_qr_range(
         f"{base_qr_url}{base_shortned_url}{100 if is_test else i}"
         for i in postfix_range
     ]
-    descriptions = [str(i) for i in postfix_range] if base_shortned_url.startswith("aws3.link/llqrv") else None
+    descriptions = (
+        [str(i) for i in postfix_range]
+        if base_shortned_url.startswith("aws3.link/llqrv")
+        else None
+    )
     generate_qr_pdf(
         base_shortened_urls,
         filename,
