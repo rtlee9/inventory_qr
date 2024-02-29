@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from utils.qr import gen_qr
 
 
 class UrlAction(models.Model):
@@ -33,3 +34,7 @@ class UrlAction(models.Model):
         if not self.long_url:
             return
         return self.long_url.split("?")[0]
+
+    @property
+    def qr_url(self):
+        return gen_qr(f"https://aws3.link/{self.url_key}")
