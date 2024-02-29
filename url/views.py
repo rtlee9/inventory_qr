@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+
 from django.views import generic
 from django.urls import reverse
 from django import forms
@@ -6,9 +8,12 @@ from django import forms
 
 from utils.url import create, update, delete, track
 
+from . import models
+
 logger = logging.getLogger(__name__)
 
-from . import models
+DT_FMT = "%Y-%m-%d %H:%M:%S"
+
 
 class DetailView(generic.DetailView):
     model = models.UrlAction
@@ -18,14 +23,21 @@ class DetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["tracking_data"] = track(self.object.url_key)
+        tracking_data = track(self.object.url_key)
+        for hit in tracking_data["hits"]:
+            datetime_str = f"{hit['date']} {hit['time']}"
+            print(datetime_str)
+            hit["datetime"] = datetime.strptime(datetime_str, DT_FMT)
+        context["tracking_data"] = tracking_data
         return context
+
 
 url_actions = {
     "create": create,
     "update": update,
     "delete": delete,
 }
+
 
 class AllView(generic.ListView):
     model = models.UrlAction

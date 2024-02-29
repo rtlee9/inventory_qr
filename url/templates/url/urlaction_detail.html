@@ -23,8 +23,7 @@
             <table class="table" id="tracking-data" data-toggle="table" data-search="true" data-pagination="true">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Time</th>
+                        <th>Datetime</th>
                         <th>IP Address</th>
                         <th>OS</th>
                         <th>Dist</th>
@@ -34,8 +33,7 @@
                 <tbody>
                     {% for hit in tracking_data.hits %}
                     <tr>
-                        <td>{{hit.date}}</td>
-                        <td>{{hit.time}}</td>
+                        <td>{{hit.datetime}}</td>
                         <td>{{hit.ip}}</td>
                         <td>{{hit.user.os.name}}</td>
                         <td>{{hit.user.dist.name}} v{{hit.user.dist.version}}</td>
