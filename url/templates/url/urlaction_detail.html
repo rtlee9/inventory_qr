@@ -33,7 +33,7 @@
                 <tbody>
                     {% for hit in tracking_data.hits %}
                     <tr>
-                        <td>{{hit.datetime}}</td>
+                        <td>{{hit.datetime|timezone:"America/Los_Angeles"}}</td>
                         <td>{{hit.ip}}</td>
                         <td>{{hit.user.os.name}}</td>
                         <td>{{hit.user.dist.name}} v{{hit.user.dist.version}}</td>
