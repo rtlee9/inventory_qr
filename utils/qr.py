@@ -10,17 +10,18 @@ from tqdm import trange
 cache_get = lru_cache(requests.get)
 
 
-def gen_qr(url: str) -> str:
+def gen_qr(url: str, chs: str = "100x100") -> str:
     """
     Generate a QR code URL for the given input URL.
 
     Args:
     url (str): The input URL for which to generate the QR code.
+    chs (str): The size of the QR code. Defaults to "100x100".
 
     Returns:
     str: The generated QR code URL.
     """
-    base_url = "https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs=100x100&chl="
+    base_url = f"https://chart.googleapis.com/chart?cht=qr&choe=UTF-8&chs={chs}&chl="
     return base_url + url
 
 
