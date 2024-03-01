@@ -41,6 +41,7 @@ url_actions = {
 
 class AllView(generic.ListView):
     model = models.UrlAction
+    ordering = ["-pk"]
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
@@ -48,7 +49,7 @@ class AllView(generic.ListView):
 
 class MostRecentView(generic.ListView):
     model = models.UrlAction
-    ordering = ["pk"]
+    ordering = ["-pk"]
 
     def get_queryset(self):
         qs = super().get_queryset().filter(user=self.request.user)
