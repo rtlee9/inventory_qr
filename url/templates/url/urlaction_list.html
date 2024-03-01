@@ -18,6 +18,7 @@
                 <th>Long URL</th>
                 <th>Timestamp</th>
                 <th>URL Key</th>
+                <th>QR Code</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +36,7 @@
                 {% else %}
                 <td>{{ object.url_key }}</td>
                 {% endif %}
+                <td><img src="{{ object.qr_url_small }}" /></td>
             </tr>
             {% endif %}
             {% endfor %}
