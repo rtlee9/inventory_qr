@@ -24,10 +24,11 @@ class DetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tracking_data = track(self.object.url_key)
-        for hit in tracking_data["hits"]:
-            datetime_str = f"{hit['date']} {hit['time']}"
-            print(datetime_str)
-            hit["datetime"] = datetime.strptime(datetime_str, DT_FMT)
+        if "hits" in tracking_data:
+            for hit in tracking_data["hits"]:
+                datetime_str = f"{hit['date']} {hit['time']}"
+                print(datetime_str)
+                hit["datetime"] = datetime.strptime(datetime_str, DT_FMT)
         context["tracking_data"] = tracking_data
         return context
 
