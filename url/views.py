@@ -4,6 +4,7 @@ from datetime import datetime
 from django.views import generic
 from django.urls import reverse
 from django import forms
+import requests
 
 
 from utils.url import create, update, delete, track
@@ -29,6 +30,9 @@ class DetailView(generic.DetailView):
                 datetime_str = f"{hit['date']} {hit['time']}"
                 print(datetime_str)
                 hit["datetime"] = datetime.strptime(datetime_str, DT_FMT)
+                hit["ip_data"] = requests.get(
+                    f'http://ip-api.com/json/{hit["ip"]}'
+                ).json()
         context["tracking_data"] = tracking_data
         return context
 

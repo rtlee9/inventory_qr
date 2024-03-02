@@ -26,6 +26,7 @@
                     <tr>
                         <th>Datetime</th>
                         <th>IP Address</th>
+                        <th>Location</th>
                         <th>OS</th>
                         <th>Dist</th>
                         <th>Browser</th>
@@ -36,6 +37,11 @@
                     <tr>
                         <td>{{hit.datetime|timezone:"America/Los_Angeles"}}</td>
                         <td>{{hit.ip}}</td>
+                        <td>
+                            {% if 'ip_data' in hit.keys %}
+                            {{hit.ip_data.city}}, {{hit.ip_data.region}}, {{hit.ip_data.countryCode}}
+                            {% endif %}
+                        </td>
                         <td>{{hit.user.os.name}}</td>
                         <td>{{hit.user.dist.name}} v{{hit.user.dist.version}}</td>
                         <td>{{hit.user.browser.name}} v{{hit.user.browser.version}}</td>
