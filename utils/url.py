@@ -59,7 +59,7 @@ def create(long_url: str, key: Optional[str]) -> dict:
         "longUrl": long_url,
     }
     if key:
-        body["customKey"] = key
+        body["customSlug"] = key
     response = requests.post(
         "https://api.aws3.link/shorten", headers=HEADERS, data=json.dumps(body)
     )
@@ -81,7 +81,7 @@ def delete(key):
     response = requests.post(
         "https://api.aws3.link/remove",
         headers=HEADERS,
-        data=json.dumps({"key": key}),
+        data=json.dumps({"slug": key}),
     )
     data = response.json()
 
@@ -117,7 +117,7 @@ def track(key):
     response = requests.post(
         "https://api.aws3.link/track",
         headers=HEADERS,
-        data=json.dumps({"key": key}),
+        data=json.dumps({"slug": key}),
     )
 
     # Return the JSON response from the API
