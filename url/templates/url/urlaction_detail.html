@@ -10,7 +10,7 @@
             <p><strong>Action Type:</strong> {{ object.action_type }}</p>
             <p><strong>Long URL:</strong> <a href="{{ object.long_url_cleaned }}">{{ object.long_url }}</a></p>
             <p><strong>Response JSON:</strong> {{ object.response_json }}</p>
-            <p><strong>Response Code:</strong> {{ object.response_code }}</p>
+            <p class="{% if object.response_code == 200 %}text-success{% else %}text-danger{% endif %}"><strong>Response Code:</strong> {{ object.response_code }}</p>
             <p><strong>Timestamp:</strong> {{ object.timestamp|timezone:"America/Los_Angeles" }}</p>
             <p><strong>URL Key:</strong> <a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></p>
         </div>
