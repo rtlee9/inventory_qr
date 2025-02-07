@@ -41,4 +41,4 @@ class UrlAction(models.Model):
 
     @property
     def qr_url_small(self):
-        return gen_qr(f"https://aws3.link/{self.url_key}", "70x70")
+        return gen_qr(f"https://aws3.link/{self.url_key}", 70)
