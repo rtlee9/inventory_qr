@@ -95,8 +95,6 @@ class Create(generic.CreateView):
     def get_success_url(self):
         # perform the url action
         action = url_actions[self.object.action_type]
-        if not self.object.was_successfull():
-            logger.error("Error creating UrlAction object: %s", self.object)
         kwargs = {"key": self.object.url_key}
         if action in (create, update):
             kwargs["long_url"] = self.object.long_url
@@ -112,6 +110,8 @@ class Create(generic.CreateView):
             self.object.response_code = response["response_code"]
             self.object.response_json = response["response_json"]
         self.object.save()
+        if not self.object.was_successfull():
+            logger.error("Error creating UrlAction object: %s", self.object)
 
         # get success url
         url = reverse("detail", kwargs={"pk": self.object.pk})
