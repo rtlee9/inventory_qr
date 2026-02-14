@@ -25,6 +25,7 @@ class DetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         tracking_data = track(self.object.url_key)
+        logger.warning("track(%s) returned: %s", self.object.url_key, tracking_data)
         if "hits" in tracking_data:
             for hit in tracking_data["hits"]:
                 datetime_str = f"{hit['date']} {hit['time']}"
