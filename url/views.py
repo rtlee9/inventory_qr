@@ -71,6 +71,13 @@ class CreateForm(forms.ModelForm):
         model = models.UrlAction
         fields = ["action_type", "long_url", "url_key"]
 
+    def clean_url_key(self):
+        import re
+        url_key = self.cleaned_data.get("url_key", "")
+        if url_key and not re.match(r'^[a-zA-Z0-9-]+$', url_key):
+            raise forms.ValidationError("URL key can only contain letters, numbers, and hyphens.")
+        return url_key
+
     def clean_long_url(self):
         data = self.cleaned_data
         if data["action_type"] in ("create", "update") and not data["long_url"]:
