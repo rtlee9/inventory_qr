@@ -19,10 +19,11 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    import debug_toolbar
+    try:
+        import debug_toolbar
 
-    # Server statics and uploaded media
-    # Allow error pages to be tested
-    urlpatterns = [
-        path("__debug__/", include(debug_toolbar.urls)),
-    ] + urlpatterns
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls)),
+        ] + urlpatterns
+    except ImportError:
+        pass
