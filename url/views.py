@@ -35,6 +35,12 @@ class DetailView(generic.DetailView):
                     f'http://ip-api.com/json/{hit["ip"]}'
                 ).json()
         context["tracking_data"] = tracking_data
+        context["action_history"] = (
+            models.UrlAction.objects.filter(
+                url_key=self.object.url_key, user=self.request.user
+            )
+            .order_by("-timestamp")
+        )
         return context
 
 
@@ -50,7 +56,13 @@ class AllView(generic.ListView):
     ordering = ["-pk"]
 
     def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        qs = super().get_queryset().filter(user=self.request.user)
+        latest_id_per_combo = (
+            qs.order_by("url_key", "long_url", "-timestamp")
+            .distinct("url_key", "long_url")
+            .values_list("id", flat=True)
+        )
+        return qs.filter(pk__in=latest_id_per_combo)
 
 
 class MostRecentView(generic.ListView):

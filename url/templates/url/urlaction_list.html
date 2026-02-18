@@ -29,7 +29,7 @@
                 {% if 'history' in request.path %}
                 <td>{{ object.action_type }}</td>
                 {% endif %}
-                <td><a href="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned }}</a></td>
+                <td><a href="{{ object.long_url_cleaned }}" title="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned|truncatechars:50 }}</a></td>
                 <td>{{ object.timestamp|timezone:"America/Los_Angeles" }}</td>
                 {% if object.action_type != "delete" %}
                 <td><a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></td>
