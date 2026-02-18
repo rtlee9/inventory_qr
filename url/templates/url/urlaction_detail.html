@@ -45,7 +45,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <h3>URL action info</h3>
+            <h3>{{ object.url_key }}</h3>
             <img src="{{ object.qr_url }}">
             <p><strong>Long URL:</strong> <a href="{{ object.long_url_cleaned }}">{{ object.long_url }}</a></p>
             <p><strong>URL Key:</strong> <a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></p>
@@ -97,7 +97,6 @@
                 <thead>
                     <tr>
                         <th>Type</th>
-                        <th>Long URL</th>
                         <th>Status</th>
                         <th>Timestamp</th>
                         <th>JSON</th>
@@ -105,9 +104,8 @@
                 </thead>
                 <tbody>
                     {% for action in action_history %}
-                    <tr class="{% if action.pk == object.pk %}table-active{% endif %}">
+                    <tr>
                         <td>{{ action.action_type }}</td>
-                        <td><a href="{{ action.long_url_cleaned }}" title="{{ action.long_url_cleaned }}">{{ action.long_url_cleaned|truncatechars:50 }}</a></td>
                         <td class="{% if action.response_code == 200 %}text-success{% else %}text-danger{% endif %}">{{ action.response_code }}</td>
                         <td>{{ action.timestamp|timezone:"America/Los_Angeles" }}</td>
                         <td>
@@ -125,7 +123,7 @@
         </div>
     </div>
     {% endif %}
-    {% if object.action_type != "delete" %}
+    {% if latest_action.action_type != "delete" %}
     <div class="row">
         <div class="col-sm">
             <a href="{% url 'create' %}?url_key={{ object.url_key }}&action_type=delete"

@@ -35,12 +35,16 @@ class DetailView(generic.DetailView):
                     f'http://ip-api.com/json/{hit["ip"]}'
                 ).json()
         context["tracking_data"] = tracking_data
-        context["action_history"] = (
+        action_history = (
             models.UrlAction.objects.filter(
-                url_key=self.object.url_key, user=self.request.user
+                url_key=self.object.url_key,
+                long_url=self.object.long_url,
+                user=self.request.user,
             )
             .order_by("-timestamp")
         )
+        context["action_history"] = action_history
+        context["latest_action"] = action_history.first()
         return context
 
 
