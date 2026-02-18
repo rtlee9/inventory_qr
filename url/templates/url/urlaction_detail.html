@@ -1,6 +1,46 @@
 {% extends "base.html" %}
 {% load tz %}
 
+{% block extrastyles %}
+<style>
+    .json-details {
+        margin: 0.5rem 0;
+    }
+    .json-details summary {
+        cursor: pointer;
+        color: var(--text-primary);
+        padding: 0.3rem 0;
+    }
+    .json-details summary:hover {
+        color: var(--text-bright);
+    }
+    .json-block {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1rem;
+        margin: 0.5rem 0 0;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        line-height: 1.6;
+        color: var(--text-primary);
+    }
+    .json-block code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        font-size: inherit;
+    }
+    /* Syntax colors */
+    .json-key { color: var(--accent-sky); }
+    .json-str { color: var(--accent-green); }
+    .json-num { color: var(--accent-amber); }
+    .json-bool { color: var(--accent-indigo); }
+    .json-null { color: var(--text-muted); }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <div class="row">
@@ -9,9 +49,10 @@
             <img src="{{ object.qr_url }}">
             <p><strong>Action Type:</strong> {{ object.action_type }}</p>
             <p><strong>Long URL:</strong> <a href="{{ object.long_url_cleaned }}">{{ object.long_url }}</a></p>
-            <p><strong>Response JSON:</strong> {{ object.response_json }}</p>
-            <p class="{% if object.response_code == 200 %}text-success{% else %}text-danger{% endif %}"><strong>Response Code:</strong> {{ object.response_code }}</p>
-            <p><strong>Timestamp:</strong> {{ object.timestamp|timezone:"America/Los_Angeles" }}</p>
+            <details class="json-details">
+                <summary><strong>Response JSON</strong></summary>
+                <pre class="json-block"><code id="responseJson">{{ object.response_json }}</code></pre>
+            </details>
             <p><strong>URL Key:</strong> <a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></p>
         </div>
     </div>
@@ -93,4 +134,30 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+(function() {
+    var el = document.getElementById('responseJson');
+    if (!el) return;
+    var raw = el.textContent.trim();
+    // Django renders Python dicts with single quotes; normalize to valid JSON
+    try {
+        var obj = JSON.parse(raw);
+    } catch(e) {
+        try {
+            obj = JSON.parse(raw.replace(/'/g, '"').replace(/None/g, 'null').replace(/True/g, 'true').replace(/False/g, 'false'));
+        } catch(e2) {
+            return; // leave as-is if unparseable
+        }
+    }
+    var pretty = JSON.stringify(obj, null, 2);
+    // Syntax highlight
+    el.innerHTML = pretty.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"([^"]+)"(\s*:)/g, '<span class="json-key">"$1"</span>$2')
+        .replace(/:\s*"([^"]*)"/g, ': <span class="json-str">"$1"</span>')
+        .replace(/:\s*(\d+\.?\d*)/g, ': <span class="json-num">$1</span>')
+        .replace(/:\s*(true|false)/g, ': <span class="json-bool">$1</span>')
+        .replace(/:\s*(null)/g, ': <span class="json-null">$1</span>');
+})();
+</script>
 {% endblock %}

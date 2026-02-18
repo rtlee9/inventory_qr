@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html>
-{% block title %}{{ section.title }}{% endblock %}
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- bootstrap -->
+    <title>{% block title %}Dynamic QR{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap (compat for form/detail pages) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
@@ -16,33 +22,247 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --bg-deep: #0B0D13;
+            --bg-surface: #12151E;
+            --bg-card: #181C28;
+            --bg-card-hover: #1F2435;
+            --bg-elevated: #262C3F;
+            --border: #262C3F;
+            --border-light: #323952;
+            --text-bright: #F1F3F9;
+            --text-primary: #C8CEDF;
+            --text-secondary: #7E87A0;
+            --text-muted: #4F5672;
+            --accent-indigo: #818CF8;
+            --accent-amber: #FBBF24;
+            --accent-sky: #38BDF8;
+            --accent-green: #4ADE80;
+            --accent-red: #F87171;
+            --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: var(--font-display);
+            min-height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        /* Subtle dot grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, var(--border) 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body > * { position: relative; z-index: 1; }
+
+        /* ── Navbar ── */
+        .site-nav {
+            background: rgba(18, 21, 30, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .site-nav__brand {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text-bright);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .site-nav__brand:hover { color: var(--accent-amber); text-decoration: none; }
+        .site-nav__brand::before {
+            content: '▣';
+            font-size: 1.2rem;
+            color: var(--accent-amber);
+        }
+
+        .site-nav__links {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .site-nav__link {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+        }
+        .site-nav__link:hover {
+            color: var(--text-bright);
+            background: var(--bg-card);
+            text-decoration: none;
+        }
+        .site-nav__link--active {
+            color: var(--text-bright);
+            background: var(--bg-elevated);
+        }
+
+        .site-nav__actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-nav {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.35rem 0.85rem;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            background: transparent;
+            cursor: pointer;
+        }
+        .btn-nav:hover {
+            color: var(--text-bright);
+            border-color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .btn-nav--primary {
+            background: var(--accent-indigo);
+            border-color: var(--accent-indigo);
+            color: #fff;
+        }
+        .btn-nav--primary:hover {
+            background: #6D75E8;
+            border-color: #6D75E8;
+            color: #fff;
+        }
+
+        /* ── Bootstrap dark overrides ── */
+        .container { max-width: 960px; }
+        .table { color: var(--text-primary); border-color: var(--border); }
+        .table th { border-color: var(--border); color: var(--text-secondary); font-weight: 500; }
+        .table td { border-color: var(--border); }
+        .table-active { background: var(--bg-card-hover) !important; }
+        .table-active td { color: var(--text-bright); }
+        .text-success { color: var(--accent-green) !important; }
+        .text-danger { color: var(--accent-red) !important; }
+
+        a { color: var(--accent-sky); }
+        a:hover { color: var(--accent-indigo); }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            color: var(--text-bright);
+            font-weight: 600;
+        }
+        code {
+            font-family: var(--font-mono);
+            background: var(--bg-elevated);
+            padding: 0.15em 0.4em;
+            border-radius: 3px;
+            color: var(--accent-amber);
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: var(--accent-indigo);
+            border-color: var(--accent-indigo);
+        }
+        .btn-primary:hover {
+            background: #6D75E8;
+            border-color: #6D75E8;
+        }
+        .btn-outline-secondary {
+            color: var(--text-secondary);
+            border-color: var(--border-light);
+        }
+        .btn-outline-secondary:hover {
+            color: var(--text-bright);
+            background: var(--bg-elevated);
+            border-color: var(--text-secondary);
+        }
+
+        .form-control {
+            background: var(--bg-card);
+            border-color: var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+        }
+        .form-control:focus {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-indigo);
+            color: var(--text-bright);
+            box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.15);
+        }
+        select.form-control { appearance: auto; }
+        label { color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; }
+
+        /* ── Page content ── */
+        .page-content {
+            padding: 2rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ── Mobile nav ── */
+        @media (max-width: 640px) {
+            .site-nav { padding: 0 1rem; }
+            .site-nav__link { padding: 0.35rem 0.5rem; font-size: 0.8rem; }
+            .btn-nav { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+        }
+    </style>
+    {% block extrastyles %}{% endblock %}
     {% block extrascripts %}{% endblock %}
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">Dynamic QR</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'create' %}">Create</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'history' %}">History</a>
-                </li>
-            </ul>
+    <nav class="site-nav">
+        <a class="site-nav__brand" href="/">Dynamic QR</a>
+        <div class="site-nav__links">
+            <a class="site-nav__link" href="{% url 'most_recent' %}">Dashboard</a>
+            <a class="site-nav__link" href="{% url 'create' %}">Create</a>
+            <a class="site-nav__link" href="{% url 'history' %}">History</a>
+        </div>
+        <div class="site-nav__actions">
             {% if user.is_authenticated %}
-            <form action="{% url 'logout' %}" method="post" class="form-inline my-2 my-lg-0">
+            <form action="{% url 'logout' %}" method="post" style="margin:0;">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-secondary my-2 my-sm-0">Log Out</button>
+                <button type="submit" class="btn-nav">Log Out</button>
             </form>
             {% else %}
-            <a class="btn btn-outline-primary my-2 mx-2" href="{% url 'django_registration_register' %}">Sign up</a>
-            <a class="btn btn-outline-secondary my-2 mx-2" href="{% url 'login' %}">Log In</a>
+            <a class="btn-nav" href="{% url 'login' %}">Log In</a>
+            <a class="btn-nav btn-nav--primary" href="{% url 'django_registration_register' %}">Sign Up</a>
             {% endif %}
         </div>
     </nav>

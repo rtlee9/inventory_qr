@@ -1,46 +1,324 @@
 {% extends "base.html" %}
 {% load tz %}
 
-{% block extrascripts %}
-<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.2/dist/bootstrap-table.min.css">
-<script src="https://unpkg.com/bootstrap-table@1.22.2/dist/bootstrap-table.min.js"></script>
+{% block extrastyles %}
+<style>
+    /* ── Page header ── */
+    .dash-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .dash-header__left {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+    }
+
+    .dash-title {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin: 0;
+        letter-spacing: -0.03em;
+    }
+
+    .dash-count {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+    }
+
+    /* ── Search ── */
+    .dash-search {
+        position: relative;
+    }
+    .dash-search__icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        font-size: 0.85rem;
+    }
+    .dash-search__input {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 0.5rem 0.75rem 0.5rem 2.1rem;
+        border-radius: var(--radius-md);
+        width: 240px;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+    .dash-search__input::placeholder { color: var(--text-muted); }
+    .dash-search__input:focus {
+        border-color: var(--accent-indigo);
+        background: var(--bg-card-hover);
+        box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+        width: 280px;
+    }
+
+    /* ── Card Grid ── */
+    .url-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    .url-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent-amber);
+        border-radius: var(--radius-lg);
+        padding: 1.1rem 1.25rem;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+        overflow: hidden;
+    }
+    .url-card:hover {
+        background: var(--bg-card-hover);
+        border-color: var(--border-light);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        color: inherit;
+        text-decoration: none;
+    }
+    /* History badge */
+    .url-card__type {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+    .url-card__type--create {
+        background: rgba(74, 222, 128, 0.12);
+        color: var(--accent-green);
+    }
+    .url-card__type--update {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--accent-amber);
+    }
+    .url-card__type--delete {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--accent-red);
+    }
+
+    /* Key label */
+    .url-card__key {
+        font-family: var(--font-mono);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin-bottom: 0.35rem;
+        word-break: break-all;
+    }
+
+    /* Destination URL */
+    .url-card__dest {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.6rem;
+        line-height: 1.4;
+        word-break: break-all;
+        max-width: 100%;
+    }
+
+    /* Timestamp */
+    .url-card__meta {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-top: auto;
+    }
+    .url-card__meta::before {
+        content: '';
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent-green);
+        flex-shrink: 0;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1rem;
+    }
+    .empty-state__icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+    .empty-state__title {
+        font-family: var(--font-display);
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    .empty-state__desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+    .empty-state__cta {
+        display: inline-block;
+        font-family: var(--font-display);
+        font-size: 0.85rem;
+        font-weight: 500;
+        background: var(--accent-indigo);
+        color: #fff;
+        text-decoration: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: var(--radius-sm);
+        transition: all 0.15s ease;
+    }
+    .empty-state__cta:hover {
+        background: #6D75E8;
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    /* No results from search */
+    .no-results {
+        display: none;
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        grid-column: 1 / -1;
+    }
+
+    /* ── Stagger animation ── */
+    @keyframes cardIn {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .url-card {
+        animation: cardIn 0.35s ease both;
+    }
+
+    @media (max-width: 640px) {
+        .dash-header { flex-direction: column; align-items: stretch; }
+        .dash-search__input { width: 100%; }
+        .dash-search__input:focus { width: 100%; }
+        .url-grid { grid-template-columns: 1fr; }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <table class="table" id="url-action-list" data-toggle="table" data-search="true" data-pagination="true">
-        <thead>
-            <tr>
-                <th>ID</th>
+<div class="page-content">
+
+    <div class="dash-header">
+        <div class="dash-header__left">
+            <h1 class="dash-title">
                 {% if 'history' in request.path %}
-                <th>Type</th>
-                {% endif %}
-                <th>Long URL</th>
-                <th>Timestamp</th>
-                <th>URL Key</th>
-                <th>QR Code</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for object in object_list %}
-            {% if object.was_successfull %}
-            <tr>
-                <td><a href="{{ object.get_absolute_url }}">{{ object.id }}</a></td>
-                {% if 'history' in request.path %}
-                <td>{{ object.action_type }}</td>
-                {% endif %}
-                <td><a href="{{ object.long_url_cleaned }}" title="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned|truncatechars:50 }}</a></td>
-                <td>{{ object.timestamp|timezone:"America/Los_Angeles" }}</td>
-                {% if object.action_type != "delete" %}
-                <td><a href="https://aws3.link/{{ object.url_key }}">{{ object.url_key }}</a></td>
+                    History
                 {% else %}
-                <td>{{ object.url_key }}</td>
+                    Dashboard
                 {% endif %}
-                <td><img src="{{ object.qr_url_small }}" /></td>
-            </tr>
+            </h1>
+            {% if object_list %}
+            <span class="dash-count">{{ object_list|length }} url{{ object_list|length|pluralize }}</span>
             {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+        </div>
+        {% if object_list %}
+        <div class="dash-search">
+            <span class="dash-search__icon">&#x2315;</span>
+            <input
+                type="text"
+                class="dash-search__input"
+                id="cardSearch"
+                placeholder="Search urls..."
+                autocomplete="off"
+            >
+        </div>
+        {% endif %}
+    </div>
+
+    {% if object_list %}
+    <div class="url-grid" id="urlGrid">
+        {% for object in object_list %}
+        {% if object.was_successfull %}
+        <a href="{{ object.get_absolute_url }}" class="url-card" style="animation-delay: {{ forloop.counter0 }}00ms"
+            data-search="{{ object.url_key|lower }} {{ object.long_url_cleaned|lower }}">
+            {% if 'history' in request.path %}
+            <span class="url-card__type url-card__type--{{ object.action_type }}">{{ object.action_type }}</span>
+            {% endif %}
+            <div class="url-card__key">{{ object.url_key }}</div>
+            <div class="url-card__dest" title="{{ object.long_url_cleaned }}">{{ object.long_url_cleaned|truncatechars:60 }}</div>
+            <div class="url-card__meta">
+                {{ object.timestamp|timezone:"America/Los_Angeles"|date:"M j, Y \a\t g:i A" }}
+            </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+        <div class="no-results" id="noResults">No matching URLs found.</div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state__icon">&#x25A3;</div>
+        <div class="empty-state__title">No URLs yet</div>
+        <div class="empty-state__desc">Create your first shortened URL to get started.</div>
+        <a href="{% url 'create' %}" class="empty-state__cta">Create URL</a>
+    </div>
+    {% endif %}
+
 </div>
+
+<script>
+(function() {
+    var input = document.getElementById('cardSearch');
+    if (!input) return;
+    var grid = document.getElementById('urlGrid');
+    var cards = grid.querySelectorAll('.url-card');
+    var noResults = document.getElementById('noResults');
+
+    input.addEventListener('input', function() {
+        var q = this.value.toLowerCase().trim();
+        var visible = 0;
+        cards.forEach(function(card) {
+            var data = card.getAttribute('data-search') || '';
+            var match = !q || data.indexOf(q) !== -1;
+            card.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+        noResults.style.display = visible === 0 ? 'block' : 'none';
+    });
+})();
+</script>
 {% endblock %}
